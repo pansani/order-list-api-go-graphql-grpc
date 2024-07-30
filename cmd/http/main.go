@@ -64,5 +64,5 @@ func main() {
 	r.HandleFunc("/order", listOrders).Methods("GET")
 
 	log.Println("Server started at :8080")
-	log.Fatal(http.ListenAndServe(":8081", r))
+	log.Fatal(http.ListenAndServe(":8080", r))
 }
