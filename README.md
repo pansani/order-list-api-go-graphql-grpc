@@ -266,5 +266,3 @@ To start the application using the Makefile, follow these steps:
   ```bash
   make logs
   ```
-
-This section of the README should now guide users effectively on how to use the Makefile to manage the application lifecycle. Make sure to customize any part of this documentation to better fit the specific needs or changes in your project setup.
