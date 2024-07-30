@@ -1,0 +1,13 @@
+type Order {
+  id: Int!
+  user_id: Int!
+  product_id: Int!
+  quantity: Int!
+  status: String!
+  created_at: String!
+  updated_at: String!
+}
+
+type Query {
+  listOrders: [Order!]!
+}

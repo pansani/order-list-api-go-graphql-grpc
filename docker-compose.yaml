@@ -1,0 +1,61 @@
+version: "3.9"
+
+services:
+  db:
+    image: postgres:13
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: orders_db
+    ports:
+      - "5434:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+  graphql:
+    build:
+      context: .
+      dockerfile: Dockerfile.graphql
+    environment:
+      DB_USER: user
+      DB_PASSWORD: password
+      DB_NAME: orders_db
+      DB_HOST: db
+      DB_PORT: 5432
+    ports:
+      - "8081:8081"
+    depends_on:
+      - db
+
+  rest-api:
+    build:
+      context: .
+      dockerfile: Dockerfile.rest
+    environment:
+      DB_USER: user
+      DB_PASSWORD: password
+      DB_NAME: orders_db
+      DB_HOST: db
+      DB_PORT: 5432
+    ports:
+      - "50051:50051"
+    depends_on:
+      - db
+
+  grpc:
+    build:
+      context: .
+      dockerfile: Dockerfile.grpc
+    environment:
+      DB_USER: user
+      DB_PASSWORD: password
+      DB_NAME: orders_db
+      DB_HOST: db
+      DB_PORT: 5432
+    ports:
+      - "50052:50052"
+    depends_on:
+      - db
+
+volumes:
+  pgdata:

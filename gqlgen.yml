@@ -1,0 +1,11 @@
+schema:
+  - cmd/graphql/schema.graphql
+exec:
+  filename: cmd/graphql/generated.go
+  package: main
+model:
+  filename: cmd/graphql/models_gen.go
+  package: main
+resolver:
+  filename: cmd/graphql/resolver.go
+  package: main

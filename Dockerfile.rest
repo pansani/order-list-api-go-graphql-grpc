@@ -1,0 +1,17 @@
+FROM golang:1.19
+
+WORKDIR /app
+
+
+COPY go.mod go.sum ./
+RUN go mod download
+
+COPY cmd/http ./cmd/http
+COPY migrations ./migrations
+COPY pb ./pb
+
+WORKDIR /app/cmd/http
+RUN go build -o main .
+
+CMD ["./main"]
+
