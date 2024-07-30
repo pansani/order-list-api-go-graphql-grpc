@@ -1,10 +1,8 @@
 # Variables
-DOCKER_COMPOSE = docker-compose
-IMAGE_NAME = order-list-golang-app
-REST_API_IMAGE_NAME = order-list-golang-rest-api
-DB_CONTAINER_NAME = order-list-golang-db-1
-APP_CONTAINER_NAME = order-list-golang-app-1
-REST_API_CONTAINER_NAME = order-list-golang-rest-api-1
+APP_CONTAINER_NAME=order-list-golang-app-1
+REST_API_CONTAINER_NAME=order-list-golang-rest-api-1
+DB_CONTAINER_NAME=order-list-golang-db-1
+DOCKER_COMPOSE=docker-compose
 
 # Default target
 all: build up
@@ -23,7 +21,7 @@ down:
 
 # Run database migrations
 migrate:
-	$(DOCKER_COMPOSE) run --rm db psql -U user -d orders_db -f /migrations/create_orders_table.sql
+	$(DOCKER_COMPOSE) exec db psql -U $$DB_USER -d $$DB_NAME -f /migrations/create_orders_table.sql
 
 # View logs from Docker containers
 logs:
@@ -44,4 +42,21 @@ rebuild: down build up
 clean:
 	docker system prune -a --volumes -f
 
-.PHONY: all build up down migrate logs shell dbshell rebuild clean
+# Insert sample data into the database
+seed:
+	$(DOCKER_COMPOSE) exec db psql -U $$DB_USER -d $$DB_NAME -c "INSERT INTO orders (user_id, product_id, quantity, status, created_at, updated_at) VALUES (1, 101, 2, 'Pending', '2024-07-30 10:00:00', '2024-07-30 10:00:00'), (2, 102, 1, 'Shipped', '2024-07-30 11:00:00', '2024-07-30 11:00:00'), (3, 103, 5, 'Delivered', '2024-07-30 12:00:00', '2024-07-30 12:00:00');"
+
+# Test REST API using curl
+test-rest:
+	curl http://localhost:8080/order
+
+# Test GraphQL API using curl
+test-graphql:
+	curl -X POST http://localhost:8081/query -H "Content-Type: application/json" -d '{"query": "{ listOrders { id user_id product_id quantity status created_at updated_at } }"}'
+
+# Test gRPC service using grpcurl
+test-grpc:
+	grpcurl -plaintext -d '{}' localhost:50051 order.OrderService/ListOrders
+
+.PHONY: all build up down migrate logs shell dbshell rebuild clean seed test-rest test-graphql test-grpc
+
