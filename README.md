@@ -16,7 +16,7 @@ This project is an implementation of a simple order listing service using gRPC, 
    - [gRPC](#grpc)
 7. [Clean Up](#clean-up)
 
-## Prerequisites
+## 1. Prerequisites
 
 - [Docker](https://www.docker.com/get-started)
 - [Docker Compose](https://docs.docker.com/compose/install/)
