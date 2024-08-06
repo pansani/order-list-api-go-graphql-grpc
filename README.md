@@ -48,40 +48,7 @@ This will build the application and start all the services defined in the `docke
 
 ## 4. Run Migrations
 
-To create the required tables in the PostgreSQL database, execute the following command:
-
-```bash
- docker-compose exec db sh 
-```
-
-```bash
-psql -U user -d orders_db
-```
-
-```bash
-  CREATE TABLE IF NOT EXISTS orders (
-    id SERIAL PRIMARY KEY,
-    user_id INT NOT NULL,
-    product_id INT NOT NULL,
-    quantity INT NOT NULL,
-    status VARCHAR(50) NOT NULL,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
-
-
-  INSERT INTO orders (user_id, product_id, quantity, status, created_at, updated_at) VALUES
-    (1, 101, 2, 'Pending', '2024-07-30 10:00:00', '2024-07-30 10:00:00'),
-    (2, 102, 1, 'Shipped', '2024-07-30 11:00:00', '2024-07-30 11:00:00'),
-    (3, 103, 5, 'Delivered', '2024-07-30 12:00:00', '2024-07-30 12:00:00');
-```
-```bash
-   \q
-```
-
-```bash
-  exit
-```
+Migrations will be automatically run by the migrate service defined in docker-compose.yml.
 
 ## 5. Testing the Services
 

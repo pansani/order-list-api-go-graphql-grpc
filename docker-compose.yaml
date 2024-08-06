@@ -65,5 +65,23 @@ services:
       db:
         condition: service_healthy
 
+  migrate:
+    image: postgres:13
+    depends_on:
+      db:
+        condition: service_healthy
+    entrypoint:
+      [
+        "sh",
+        "-c",
+        "until pg_isready -h db -U $POSTGRES_USER; do sleep 1; done; psql -h db -U $POSTGRES_USER -d $POSTGRES_DB -f /migrations/create_orders_table.sql && psql -h db -U $POSTGRES_USER -d $POSTGRES_DB -f /migrations/insert_orders.sql",
+      ]
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: orders_db
+    volumes:
+      - ./migrations:/migrations
+
 volumes:
   pgdata:
