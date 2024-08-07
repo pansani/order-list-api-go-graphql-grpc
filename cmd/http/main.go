@@ -46,6 +46,26 @@ func listOrders(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(orders)
 }
 
+func createOrder(w http.ResponseWriter, r *http.Request) {
+	var order Order
+	if err := json.NewDecoder(r.Body).Decode(&order); err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	query := `INSERT INTO orders (user_id, product_id, quantity, status, created_at, updated_at)
+			  VALUES ($1, $2, $3, $4, NOW(), NOW()) RETURNING id, created_at, updated_at`
+	err := db.QueryRow(query, order.UserID, order.ProductID, order.Quantity, order.Status).Scan(&order.ID, &order.CreatedAt, &order.UpdatedAt)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusCreated)
+	json.NewEncoder(w).Encode(order)
+}
+
 func initDB() {
 	var err error
 	connStr := fmt.Sprintf("user=%s password=%s dbname=%s sslmode=disable host=%s port=%s",
@@ -62,6 +82,7 @@ func main() {
 
 	r := mux.NewRouter()
 	r.HandleFunc("/order", listOrders).Methods("GET")
+	r.HandleFunc("/order", createOrder).Methods("POST")
 
 	log.Println("Server started at :8080")
 	log.Fatal(http.ListenAndServe(":8080", r))

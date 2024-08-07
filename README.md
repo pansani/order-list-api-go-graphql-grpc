@@ -56,6 +56,10 @@ Migrations will be automatically run by the migrate service defined in docker-co
 
 You can test the REST API using `curl` or any API testing tool like Postman. The REST API will be available at `http://localhost:8080`.
 
+```bash 
+curl -X POST -H "Content-Type: application/json" -d '{"user_id": 1, "product_id": 101, "quantity": 2, "status": "pending"}' http://localhost:8080/order
+```
+
 ```bash
 curl http://localhost:8080/order
 ```

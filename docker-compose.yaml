@@ -4,15 +4,15 @@ services:
   db:
     image: postgres:13
     environment:
-      POSTGRES_USER: user
-      POSTGRES_PASSWORD: password
-      POSTGRES_DB: orders_db
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_NAME}
     ports:
       - "5434:5432"
     volumes:
       - pgdata:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U user -d orders_db"]
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER} -d ${DB_NAME}"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -22,11 +22,11 @@ services:
       context: .
       dockerfile: Dockerfile.graphql
     environment:
-      DB_USER: user
-      DB_PASSWORD: password
-      DB_NAME: orders_db
-      DB_HOST: db
-      DB_PORT: 5432
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
+      DB_NAME: ${DB_NAME}
+      DB_HOST: ${DB_HOST}
+      DB_PORT: ${DB_PORT}
     ports:
       - "8081:8081"
     depends_on:
@@ -38,11 +38,11 @@ services:
       context: .
       dockerfile: Dockerfile.rest
     environment:
-      DB_USER: user
-      DB_PASSWORD: password
-      DB_NAME: orders_db
-      DB_HOST: db
-      DB_PORT: 5432
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
+      DB_NAME: ${DB_NAME}
+      DB_HOST: ${DB_HOST}
+      DB_PORT: ${DB_PORT}
     ports:
       - "8080:8080"
     depends_on:
@@ -54,11 +54,11 @@ services:
       context: .
       dockerfile: Dockerfile.grpc
     environment:
-      DB_USER: user
-      DB_PASSWORD: password
-      DB_NAME: orders_db
-      DB_HOST: db
-      DB_PORT: 5432
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
+      DB_NAME: ${DB_NAME}
+      DB_HOST: ${DB_HOST}
+      DB_PORT: ${DB_PORT}
     ports:
       - "50051:50051"
     depends_on:
@@ -74,12 +74,12 @@ services:
       [
         "sh",
         "-c",
-        "until pg_isready -h db -U $POSTGRES_USER; do sleep 1; done; psql -h db -U $POSTGRES_USER -d $POSTGRES_DB -f /migrations/create_orders_table.sql && psql -h db -U $POSTGRES_USER -d $POSTGRES_DB -f /migrations/insert_orders.sql",
+        "until pg_isready -h ${DB_HOST} -U ${DB_USER}; do sleep 1; done; PGPASSWORD=${DB_PASSWORD} psql -h ${DB_HOST} -U ${DB_USER} -d ${DB_NAME} -f /migrations/create_orders_table.sql",
       ]
     environment:
-      POSTGRES_USER: user
-      POSTGRES_PASSWORD: password
-      POSTGRES_DB: orders_db
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_NAME}
     volumes:
       - ./migrations:/migrations
 
