@@ -2,14 +2,11 @@ package main
 
 import (
 	"context"
-	"database/sql"
 	"log"
 	"time"
 
 	_ "github.com/lib/pq"
 )
-
-var db *sql.DB
 
 type Resolver struct{}
 
@@ -42,21 +39,21 @@ func (r *queryResolver) ListOrders(ctx context.Context) ([]*Order, error) {
 
 func (r *mutationResolver) CreateOrder(ctx context.Context, userID int, productID int, quantity int, status string) (*Order, error) {
 	now := time.Now().Format(time.RFC3339)
-	result, err := db.ExecContext(ctx, "INSERT INTO orders (user_id, product_id, quantity, status, created_at, updated_at) VALUES ($1, $2, $3, $4, $5, $6)",
-		userID, productID, quantity, status, now, now)
+	var orderID int
+
+	err := db.QueryRowContext(ctx, `
+		INSERT INTO orders (user_id, product_id, quantity, status, created_at, updated_at) 
+		VALUES ($1, $2, $3, $4, $5, $6) 
+		RETURNING id`,
+		userID, productID, quantity, status, now, now).Scan(&orderID)
+
 	if err != nil {
 		log.Println("Error inserting order:", err)
 		return nil, err
 	}
 
-	id, err := result.LastInsertId()
-	if err != nil {
-		log.Println("Error getting last insert ID:", err)
-		return nil, err
-	}
-
 	return &Order{
-		ID:        int(id),
+		ID:        orderID,
 		UserID:    userID,
 		ProductID: productID,
 		Quantity:  quantity,
