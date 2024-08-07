@@ -68,9 +68,25 @@ curl http://localhost:8080/order
 
 You can test the GraphQL API using the GraphQL Playground available at `http://localhost:8081/playground`.
 
-Example Query:
+Create Order:
 
-```graphql
+```bash
+mutation {
+  createOrder(user_id: 1, product_id: 101, quantity: 3, status: "pending") {
+    id
+    user_id
+    product_id
+    quantity
+    status
+    created_at
+    updated_at
+  }
+}
+```
+
+List Orders:
+
+```bash
 query {
   listOrders {
     id
