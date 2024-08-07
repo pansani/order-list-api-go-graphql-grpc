@@ -108,7 +108,18 @@ You can test the gRPC service using `grpcurl`. The gRPC service will be availabl
 grpcurl -plaintext localhost:50051 list
 ```
 
-To call the `ListOrders` method:
+#### Create Order
+
+```bash
+grpcurl -plaintext -d '{
+  "user_id": 1,
+  "product_id": 101,
+  "quantity": 3,
+  "status": "pending"
+}' localhost:50051 order.OrderService/CreateOrder
+```
+
+#### List Orders
 
 ```bash
 grpcurl -plaintext -d '{}' localhost:50051 order.OrderService/ListOrders

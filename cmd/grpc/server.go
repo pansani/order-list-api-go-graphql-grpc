@@ -7,6 +7,7 @@ import (
 	"log"
 	"net"
 	"os"
+	"time"
 
 	"github.com/joho/godotenv"
 	_ "github.com/lib/pq"
@@ -38,6 +39,33 @@ func (s *server) ListOrders(ctx context.Context, in *pb.ListOrdersRequest) (*pb.
 	}
 
 	return &pb.ListOrdersResponse{Orders: orders}, nil
+}
+
+func (s *server) CreateOrder(ctx context.Context, in *pb.CreateOrderRequest) (*pb.CreateOrderResponse, error) {
+	now := time.Now().Format(time.RFC3339)
+	var orderID int32
+
+	err := db.QueryRowContext(ctx, `
+		INSERT INTO orders (user_id, product_id, quantity, status, created_at, updated_at) 
+		VALUES ($1, $2, $3, $4, $5, $6) 
+		RETURNING id`,
+		in.UserId, in.ProductId, in.Quantity, in.Status, now, now).Scan(&orderID)
+
+	if err != nil {
+		return nil, err
+	}
+
+	order := &pb.Order{
+		Id:        orderID,
+		UserId:    in.UserId,
+		ProductId: in.ProductId,
+		Quantity:  in.Quantity,
+		Status:    in.Status,
+		CreatedAt: now,
+		UpdatedAt: now,
+	}
+
+	return &pb.CreateOrderResponse{Order: order}, nil
 }
 
 func initDB() {
